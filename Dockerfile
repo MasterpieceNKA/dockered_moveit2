@@ -1,4 +1,4 @@
-FROM osrf/ros:humble-desktop-full
+FROM osrf/ros:jazzy-desktop-full
 
 # Add ubuntu user with same UID and GID as your host system, if it doesn't already exist
 # Since Ubuntu 24.04, a non-root user is created by default with the name vscode and UID=1000
@@ -22,26 +22,17 @@ USER $USERNAME
 RUN sudo usermod --append --groups video $USERNAME
 
 # Update all packages
-RUN sudo apt update && sudo apt upgrade -y
+RUN sudo apt update && sudo apt dist-upgrade -y && sudo apt upgrade -y
 
 # Install Git
 RUN sudo apt install -y \
-    build-essential \
-    cmake \
-    git \
     nano \
     ntp \
-    python3-colcon-common-extensions \
-    python3-colcon-mixin \
-    python3-flake8 \
-    python3-rosdep \
-    python3-setuptools \
-    python3-vcstool \
-    ros-humble-rmw-cyclonedds-cpp \
-    wget
+    ros-jazzy-rmw-cyclonedds-cpp \
+    wget    
 
 # Update all packages
-RUN sudo apt update && sudo apt dist-upgrade -y && sudo apt upgrade -y
+RUN sudo apt update && sudo apt upgrade -y
 
 # Rosdep update
 RUN rosdep update
@@ -52,11 +43,21 @@ RUN echo "source /opt/ros/${ROS_DISTRO}/setup.bash" >> ~/.bashrc
 RUN echo "source /usr/share/colcon_argcomplete/hook/colcon-argcomplete.bash" >> ~/.bashrc
 
 # Install MoveIT
-ARG SETUP_FILE=./moveit2_humble_setup.sh
-RUN sudo wget 'https://gist.githubusercontent.com/MasterpieceNKA/28e10beee8f10c2a41228d8a7fb8348d/raw/8091094222c342e331adf2ed9da2710274749335/moveit2_humble_setup.sh' 
-RUN sudo chmod +x $SETUP_FILE
-RUN sudo chown $USERNAME $SETUP_FILE
-RUN $SETUP_FILE
+RUN sudo apt install -y \
+    ros-jazzy-moveit \
+    ros-jazzy-moveit-task-constructor-capabilities \
+    ros-jazzy-moveit-task-constructor-core \
+    ros-jazzy-moveit-task-constructor-demo \
+    ros-jazzy-moveit-task-constructor-msgs \
+    ros-jazzy-moveit-task-constructor-visualization
+
+#ARG MTC_SETUP=./moveit2_task_constructor_setup.sh
+#RUN sudo wget \
+#    "https://gist.githubusercontent.com/MasterpieceNKA/1666e6cbc93732b2028fdccbbbc571e1/raw/0dd41d02f72af473b103101b19d37ffd7fcbd43b/setup_moveit2_task_constructor.sh" \
+#    -O $MTC_SETUP
+#RUN sudo chmod +x $MTC_SETUP
+#RUN sudo chown $USERNAME $MTC_SETUP
+#RUN $MTC_SETUP
 
 ################################
 ## ADD ANY CUSTOM SETUP BELOW ##
